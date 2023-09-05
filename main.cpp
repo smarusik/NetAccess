@@ -5,13 +5,13 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    Emitter emitter=new Emitter;
-    Acceptor acceptor=new Acceptor;
+    Worker w;
+    Initiator init;
 
-    QObject::connect(&emitter, &Emitter::emitData,
-            &acceptor, &Acceptor::acceptData);
+    QObject::connect(&init, &Initiator::subjectUpdateRequested,
+                     &w, &Worker::process);
 
-    emitter.run();
+    init.getData();
 
     return a.exec();
 }

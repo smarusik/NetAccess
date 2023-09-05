@@ -5,47 +5,124 @@
 #include <QNetworkReply>
 #include <QThread>
 #include <QObject>
+#include <mutex>
 
-class Acceptor : public QObject
+class Subject:public QObject
 {
-    Q_OBJECT
-public:
-    Acceptor(QObject *parent=nullptr):QObject(parent){}
-public slots:
-    void acceptData(QByteArray data)
-    {
-        qDebug()<<data;
-    }
+    mutable std::mutex mu_;
+    QByteArray data_;
+    volatile bool ready_=false;
 
-};
-
-class Emitter : public QObject
-{
     Q_OBJECT
-    QNetworkAccessManager manager;
-    QNetworkReply *reply;
+
 private slots:
-    void finalizeRequest()
-    {
-        QByteArray data =reply->readAll();
-        reply->close();
-        reply->deleteLater();
-        emit emitData(data);
-    }
 public:
-    Emitter(QObject *parent=nullptr): QObject(parent){}
-    void run()
+    void operator()(QNetworkAccessManager* nm)
     {
-        QNetworkRequest request;
-        request.setUrl(QUrl("https://geo.geosurf.io"));
-
-        reply=manager.get(request);
-        connect(reply, &QNetworkReply::finished,
-                this, &Emitter::finalizeRequest,
+        QNetworkRequest rq;
+        rq.setUrl(QUrl("https://geo.geosurf.io"));
+        connect(nm, &QNetworkAccessManager::finished,
+                this, &Subject::processData,
                 Qt::UniqueConnection);
+        nm->get(rq);
+    }
+
+    bool ready()
+    {
+        std::lock_guard _(mu_);
+        return ready_;
+    }
+
+    void setReady(volatile bool r)
+    {
+        std::lock_guard _(mu_);
+        ready_=r;
+    }
+
+public slots:
+    void processData(QNetworkReply *reply)
+    {
+        {
+            std::lock_guard _(mu_);
+            data_=reply->readAll();
+            reply->disconnect();
+            reply->deleteLater();
+            qDebug()<<data_;
+            ready_=true;
+        }
+
+        emit data_ready();
     }
 signals:
-    void emitData(QByteArray data);
+    void data_ready();
+};
+
+class Worker : public QObject
+{
+    Q_OBJECT
+    QNetworkAccessManager *nam;
+    QThread th;
+
+public:
+    Worker(QObject* parent=nullptr):
+        nam(new QNetworkAccessManager(this))
+    {
+        moveToThread(&th);
+        th.start();
+    }
+
+public slots:
+    void process(Subject* subject)
+    {
+        subject->setReady(false);
+        (*subject)(nam);
+    }
+
+    void quit()
+    {
+        th.quit();
+        th.wait();
+    }
+};
+
+class Initiator: public QObject
+{
+    Q_OBJECT
+
+    Subject *subject1_, *subject2_;
+
+    void updateSubject1()
+    {
+        emit subjectUpdateRequested(subject1_);
+    }
+    void updateSubject2()
+    {
+        emit subjectUpdateRequested(subject2_);
+    }
+
+    void updateState()
+    {
+
+    }
+
+public:
+    Initiator(QObject *parent=nullptr):
+        QObject(parent),
+        subject1_(new Subject),
+        subject2_(new Subject)
+    {
+        connect(subject1_, &Subject::data_ready,
+                this, &Initiator::updateState);
+    }
+
+    QByteArray getData()
+    {
+        updateSubject1();
+        return QByteArray();
+    }
+
+signals:
+    void subjectUpdateRequested(Subject*);
 };
 
 #endif // WORKERS_H
