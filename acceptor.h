@@ -23,5 +23,11 @@ public slots:
     {
         qDebug()<<data;
     }
+
+    void errorReceived(QString errorString)
+    {
+        qDebug()<<errorString;
+    }
+
 };
 #endif // ACCEPTOR_H

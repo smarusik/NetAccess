@@ -83,25 +83,29 @@ public slots:
     {
         {
             std::lock_guard _(mu_);
-            data_=reply_->readAll();
+            if(reply_->error()==QNetworkReply::NoError)
+            {
+                data_=reply_->readAll();
+                ready_=true;
+                emit data_ready(data_);
+            }
+            else
+            {
+                emit error_occured(reply_->error(), reply_->errorString());
+            }
+            reply_->close();
             reply_->disconnect();
             reply_->deleteLater();
             connect(reply_, &QNetworkReply::destroyed,
                     this, &Subject::finishRequest);
-            ready_=true;
-        }
 
-        emit data_ready(data_);
+        }
     }
 signals:
     void data_ready(QByteArray data);
+    void error_occured(QNetworkReply::NetworkError error,
+                       QString error_string);
 };
-
-
-
-
-
-
 
 class Worker : public QObject
 {
@@ -141,15 +145,24 @@ private slots:
     {
         emit subjectUpdateRequested(subject1_);
     }
+
     void subject2UpdateRequested(const QByteArray data)
     {
         emit subjectUpdateRequested(subject2_);
     }
+
     void collectRequestData(const QByteArray data)
     {
         QByteArray result="Subject1: "+subject1_->data()+" Subject2: "+data;
         emit requestedDataReady(result);
     }
+
+    void reportError(QNetworkReply::NetworkError error,
+                     QString errorString)
+    {
+        emit dataRequestError(errorString);
+    }
+
 public:
     Initiator(QObject *parent=nullptr):
         QObject(parent),
@@ -167,6 +180,9 @@ public:
             connect(start_subject, &Subject::data_ready,
                     this, &Initiator::collectRequestData,
                     Qt::SingleShotConnection);
+            connect(start_subject, &Subject::error_occured,
+                    this, &Initiator::reportError,
+                    Qt::SingleShotConnection);
 
             start_subject=subject1_;
         }
@@ -178,6 +194,9 @@ public:
             connect(start_subject, &Subject::data_ready,
                     this, &Initiator::subject2UpdateRequested,
                     Qt::SingleShotConnection);
+            connect(start_subject, &Subject::error_occured,
+                    this, &Initiator::reportError,
+                    Qt::SingleShotConnection);
         }
 
         emit subjectUpdateRequested(start_subject);
@@ -186,6 +205,7 @@ public:
 signals:
     void subjectUpdateRequested(Subject*);
     void requestedDataReady(QByteArray data);
+    void dataRequestError(QString description);
 };
 
 #endif // WORKERS_H

@@ -16,6 +16,9 @@ int main(int argc, char *argv[])
     QObject::connect(&init, &Initiator::requestedDataReady,
                      &acc, &Acceptor::dataReceived);
 
+    QObject::connect(&init, &Initiator::dataRequestError,
+                     &acc, &Acceptor::errorReceived);
+
     for(auto i=0; i<3; ++i)
         init.requestData();
 
