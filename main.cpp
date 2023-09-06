@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     QObject::connect(&init, &Initiator::subjectUpdateRequested,
                      &w, &Worker::process);
 
-    init.getData();
+    init.requestData();
 
     return a.exec();
 }

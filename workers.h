@@ -91,34 +91,17 @@ class Initiator: public QObject
 
     Subject *subject1_, *subject2_;
 
-    void updateSubject1()
-    {
-        emit subjectUpdateRequested(subject1_);
-    }
-    void updateSubject2()
-    {
-        emit subjectUpdateRequested(subject2_);
-    }
-
-    void updateState()
-    {
-
-    }
-
 public:
     Initiator(QObject *parent=nullptr):
         QObject(parent),
         subject1_(new Subject),
         subject2_(new Subject)
     {
-        connect(subject1_, &Subject::data_ready,
-                this, &Initiator::updateState);
     }
 
-    QByteArray getData()
+    void requestData()
     {
-        updateSubject1();
-        return QByteArray();
+        emit subjectUpdateRequested(subject1_);
     }
 
 signals:
