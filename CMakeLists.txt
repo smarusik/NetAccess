@@ -17,5 +17,6 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Network REQUIRED)
 add_executable(NetAccess
   main.cpp
   workers.h
+  acceptor.h
 )
 target_link_libraries(NetAccess Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)
