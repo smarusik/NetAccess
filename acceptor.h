@@ -10,24 +10,14 @@ class Acceptor : public QObject
     Q_OBJECT
     QThread th;
 public:
-    Acceptor(QObject *parent=nullptr)
-    {
-        moveToThread(&th);
-        th.start();
-    }
+    Acceptor(QObject *parent=nullptr);
 
-    virtual ~Acceptor() {}
+    virtual ~Acceptor();
 
 public slots:
-    void dataReceived(QByteArray data)
-    {
-        qDebug()<<data;
-    }
+    void dataReceived(QByteArray data);
 
-    void errorReceived(QString errorString)
-    {
-        qDebug()<<errorString;
-    }
+    void errorReceived(QString errorString);
 
 };
 #endif // ACCEPTOR_H

@@ -1,5 +1,7 @@
-#include "workers.h"
+#include "worker.h"
 #include "acceptor.h"
+#include "subject.h"
+#include "initiator.h"
 #include <QCoreApplication>
 
 int main(int argc, char *argv[])
