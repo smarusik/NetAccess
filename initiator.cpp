@@ -39,12 +39,13 @@ void Initiator::requestData()
 
     if(!start_subject->ready())
     {
+        //Singleshot
         connect(start_subject, &Subject::data_ready,
                 this, &Initiator::collectRequestData,
-                Qt::SingleShotConnection);
+                Qt::QueuedConnection);
         connect(start_subject, &Subject::error_occured,
                 this, &Initiator::reportError,
-                Qt::SingleShotConnection);
+                Qt::QueuedConnection);
 
         start_subject=subject1_;
     }
@@ -53,12 +54,13 @@ void Initiator::requestData()
 
     if(!start_subject->ready())
     {
+        //Singleshot
         connect(start_subject, &Subject::data_ready,
                 this, &Initiator::subject2UpdateRequested,
-                Qt::SingleShotConnection);
+                Qt::QueuedConnection);
         connect(start_subject, &Subject::error_occured,
                 this, &Initiator::reportError,
-                Qt::SingleShotConnection);
+                Qt::QueuedConnection);
     }
 
     QNetworkRequest rq;

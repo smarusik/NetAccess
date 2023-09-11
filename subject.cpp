@@ -55,9 +55,11 @@ void Subject::operator()(QNetworkAccessManager *nm,
 
     setIn_progress(true);
     setReply(nm->get(rq));
+
+    //Singleshot
     connect(reply_, &QNetworkReply::finished,
             this, &Subject::processData,
-            Qt::SingleShotConnection);
+            Qt::QueuedConnection);
 }
 
 const QString &Subject::url()
