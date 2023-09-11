@@ -84,6 +84,7 @@ void Subject::processData()
         reply_->close();
         reply_->disconnect();
         reply_->deleteLater();
+        disconnect(this, nullptr, nullptr, nullptr);
         connect(reply_, &QNetworkReply::destroyed,
                 this, &Subject::finishRequest);
 
