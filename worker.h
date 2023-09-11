@@ -19,7 +19,7 @@ public:
     Worker(QObject* parent=nullptr);
 
 public slots:
-    void process(Subject* subject);
+    void process(Subject* subject, QNetworkRequest rq);
 
     void quit();
 };

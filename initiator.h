@@ -24,7 +24,8 @@ public:
     void requestData();
 
 signals:
-    void subjectUpdateRequested(Subject*);
+    void subjectUpdateRequested(Subject*,
+                                QNetworkRequest rq);
     void requestedDataReady(QByteArray data);
     void dataRequestError(QString description);
 };

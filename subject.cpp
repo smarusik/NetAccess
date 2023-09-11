@@ -47,18 +47,22 @@ void Subject::setIn_progress(volatile bool newIn_progress)
     in_progress_ = newIn_progress;
 }
 
-void Subject::operator()(QNetworkAccessManager *nm)
+void Subject::operator()(QNetworkAccessManager *nm,
+                         QNetworkRequest rq)
 {
     if(in_progress())
         return;
 
     setIn_progress(true);
-    QNetworkRequest rq;
-    rq.setUrl(QUrl("https://geo.geosurf.io"));
     setReply(nm->get(rq));
     connect(reply_, &QNetworkReply::finished,
             this, &Subject::processData,
             Qt::SingleShotConnection);
+}
+
+const QString &Subject::url()
+{
+    return url_;
 }
 
 void Subject::processData()

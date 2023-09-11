@@ -2,12 +2,17 @@
 
 void Initiator::subject1UpdateRequested(const QByteArray data)
 {
-    emit subjectUpdateRequested(subject1_);
+    QNetworkRequest rq;
+    rq.setUrl(subject1_->url());
+
+    emit subjectUpdateRequested(subject1_, rq);
 }
 
 void Initiator::subject2UpdateRequested(const QByteArray data)
 {
-    emit subjectUpdateRequested(subject2_);
+    QNetworkRequest rq;
+    rq.setUrl(subject2_->url());
+    emit subjectUpdateRequested(subject2_,rq);
 }
 
 void Initiator::collectRequestData(const QByteArray data)
@@ -56,5 +61,8 @@ void Initiator::requestData()
                 Qt::SingleShotConnection);
     }
 
-    emit subjectUpdateRequested(start_subject);
+    QNetworkRequest rq;
+    rq.setUrl(start_subject->url());
+
+    emit subjectUpdateRequested(start_subject, rq);
 }

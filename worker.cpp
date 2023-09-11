@@ -7,10 +7,11 @@ Worker::Worker(QObject *parent):
     th.start();
 }
 
-void Worker::process(Subject *subject)
+void Worker::process(Subject *subject,
+                     QNetworkRequest rq)
 {
     subject->setReady(false);
-    (*subject)(nam);
+    (*subject)(nam,rq);
 }
 
 void Worker::quit()

@@ -14,6 +14,7 @@ class Subject:public QObject
     QNetworkReply *reply_;
     volatile bool ready_=false;
     volatile bool in_progress_=false;
+    const QString url_="https://geo.geosurf.io";
 
     Q_OBJECT
 
@@ -33,7 +34,10 @@ public:
     volatile bool in_progress() const;
     void setIn_progress(volatile bool newIn_progress);
 
-    void operator()(QNetworkAccessManager* nm);
+    void operator()(QNetworkAccessManager* nm,
+                    QNetworkRequest request);
+
+    virtual const QString &url();
 
 public slots:
     void processData();
