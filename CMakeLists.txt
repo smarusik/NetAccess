@@ -24,5 +24,17 @@ add_executable(NetAccess
   subject.h
   initiator.cpp
   initiator.h
+  globals.h
+  tokens/accesstoken.cpp
+  tokens/accesstoken.h
+  tokens/accesstokenbase.cpp
+  tokens/accesstokenbase.h
+  tokens/proxyaccesstoken.cpp
+  tokens/proxyaccesstoken.h
+  tokens/tokenattributes.h
+  locations/locationattributes.h
+  locations/autoserverlocation.cpp
+  locations/autoserverlocation.h
+  locations/locationattributes.cpp
 )
 target_link_libraries(NetAccess Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Network)

@@ -6,10 +6,11 @@ void Subject::finishRequest()
     setIn_progress(false);
 }
 
-Subject::Subject(int id, QObject *parent):
+Subject::Subject(DataType tp, QObject *parent):
     QObject(parent),
-    id(id)
-{}
+    dataType_(tp)
+{
+}
 
 bool Subject::ready()
 {
@@ -48,23 +49,21 @@ void Subject::setIn_progress(volatile bool newIn_progress)
 }
 
 void Subject::operator()(QNetworkAccessManager *nm,
-                         QNetworkRequest rq)
+                         QNetworkRequest rq, QByteArray payload)
 {
     if(in_progress())
         return;
 
     setIn_progress(true);
-    setReply(nm->get(rq));
+    if(payload.isEmpty())
+        setReply(nm->get(rq));
+    else
+        setReply(nm->post(rq,payload));
 
     //Singleshot
     connect(reply_, &QNetworkReply::finished,
             this, &Subject::processData,
             Qt::QueuedConnection);
-}
-
-const QString &Subject::url()
-{
-    return url_;
 }
 
 void Subject::processData()
@@ -75,7 +74,7 @@ void Subject::processData()
         {
             data_=reply_->readAll();
             ready_=true;
-            emit data_ready(data_);
+            emit data_ready(data_, dataType_);
         }
         else
         {

@@ -1,70 +1,57 @@
 #include "initiator.h"
 
-void Initiator::subject1UpdateRequested(const QByteArray data)
-{
-    QNetworkRequest rq;
-    rq.setUrl(subject1_->url());
-
-    emit subjectUpdateRequested(subject1_, rq);
-}
-
-void Initiator::subject2UpdateRequested(const QByteArray data)
-{
-    QNetworkRequest rq;
-    rq.setUrl(subject2_->url());
-    emit subjectUpdateRequested(subject2_,rq);
-}
-
-void Initiator::collectRequestData(const QByteArray data)
-{
-    QByteArray result="Subject1: "+subject1_->data()+" Subject2: "+data;
-    emit requestedDataReady(result);
-}
-
-void Initiator::reportError(QNetworkReply::NetworkError error, QString errorString)
-{
-    emit dataRequestError(errorString);
-}
-
 Initiator::Initiator(QObject *parent):
     QObject(parent),
-    subject1_(new Subject(1)),
-    subject2_(new Subject(2))
+    anonymousToken(new Subject(DataType::ANONYMOUS_TOKEN)),
+    accessToken(new Subject(DataType::ACCESS_TOKEN)),
+    proxyAccessToken(new Subject(DataType::PROXY_ACCESS_TOKEN)),
+    autoserverLocation(new Subject(DataType::AUTOSERVER_LOCATION))
 {
+    connect(anonymousToken, &Subject::data_ready,
+            this, &Initiator::requestedDataReady,
+            Qt::QueuedConnection);
+    connect(anonymousToken, &Subject::error_occured,
+            this, &Initiator::reportError,
+            Qt::QueuedConnection);
+
+    connect(accessToken, &Subject::data_ready,
+            this, &Initiator::requestedDataReady,
+            Qt::QueuedConnection);
+    connect(accessToken, &Subject::error_occured,
+            this, &Initiator::reportError,
+            Qt::QueuedConnection);
+
+    connect(proxyAccessToken, &Subject::data_ready,
+            this, &Initiator::requestedDataReady,
+            Qt::QueuedConnection);
+    connect(proxyAccessToken, &Subject::error_occured,
+            this, &Initiator::reportError,
+            Qt::QueuedConnection);
+
+    connect(autoserverLocation, &Subject::data_ready,
+            this, &Initiator::requestedDataReady,
+            Qt::QueuedConnection);
+    connect(autoserverLocation, &Subject::error_occured,
+            this, &Initiator::reportError,
+            Qt::QueuedConnection);
 }
 
-void Initiator::requestData()
+void Initiator::anonymousTokenRq(QNetworkRequest rq, QByteArray payload)
 {
-    Subject* start_subject=subject2_;
+    emit subjectUpdateRequested(anonymousToken, rq, payload);
+}
 
-    if(!start_subject->ready())
-    {
-        //Singleshot
-        connect(start_subject, &Subject::data_ready,
-                this, &Initiator::collectRequestData,
-                Qt::QueuedConnection);
-        connect(start_subject, &Subject::error_occured,
-                this, &Initiator::reportError,
-                Qt::QueuedConnection);
+void Initiator::accessTokenRq(QNetworkRequest rq, QByteArray payload)
+{
+    emit subjectUpdateRequested(accessToken,rq, payload);
+}
 
-        start_subject=subject1_;
-    }
-    else
-        collectRequestData(subject2_->data());
+void Initiator::proxyAccessTokenRq(QNetworkRequest rq, QByteArray payload)
+{
+    emit subjectUpdateRequested(proxyAccessToken,rq, payload);
+}
 
-    if(!start_subject->ready())
-    {
-        //Singleshot
-        connect(start_subject, &Subject::data_ready,
-                this, &Initiator::subject2UpdateRequested,
-                Qt::QueuedConnection);
-        connect(start_subject, &Subject::error_occured,
-                this, &Initiator::reportError,
-                Qt::QueuedConnection);
-    }
-
-    QNetworkRequest rq;
-    rq.setUrl(start_subject->url());
-
-    emit subjectUpdateRequested(start_subject, rq);
+void Initiator::autoserverLocationRq(QNetworkRequest rq, QByteArray payload)
+{
+    emit subjectUpdateRequested(autoserverLocation,rq, payload);
 }

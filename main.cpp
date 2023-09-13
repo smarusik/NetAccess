@@ -18,11 +18,18 @@ int main(int argc, char *argv[])
     QObject::connect(&init, &Initiator::requestedDataReady,
                      &acc, &Acceptor::dataReceived);
 
-    QObject::connect(&init, &Initiator::dataRequestError,
+    QObject::connect(&init, &Initiator::reportError,
                      &acc, &Acceptor::errorReceived);
 
-    for(auto i=0; i<3; ++i)
-        init.requestData();
+    QObject::connect(&acc, &Acceptor::rqAnonymousToken,
+                     &init, &Initiator::anonymousTokenRq);
+    QObject::connect(&acc, &Acceptor::rqAccessToken,
+                     &init, &Initiator::accessTokenRq);
+    QObject::connect(&acc, &Acceptor::rqAutoserverLocation,
+                     &init, &Initiator::autoserverLocationRq);
+    QObject::connect(&acc, &Acceptor::rqProxyAccessToken,
+                     &init, &Initiator::proxyAccessTokenRq);
 
+    acc.startProcessing();
     return a.exec();
 }

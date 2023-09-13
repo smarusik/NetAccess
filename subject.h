@@ -5,23 +5,32 @@
 #include <QObject>
 #include <mutex>
 
+enum class DataType
+{
+    ANONYMOUS_TOKEN,
+    ACCESS_TOKEN,
+    PROXY_ACCESS_TOKEN,
+    AUTOSERVER_LOCATION,
+    ALL_LOCATIONS,
+    CA_CERT_KEY
+};
+Q_DECLARE_METATYPE(DataType)
 
 class Subject:public QObject
 {
+    Q_OBJECT
+
     mutable std::mutex mu_;
-    const int id;
     QByteArray data_;
     QNetworkReply *reply_;
     volatile bool ready_=false;
     volatile bool in_progress_=false;
-    const QString url_="https://geo.geosurf.io";
-
-    Q_OBJECT
+    const DataType dataType_;
 
 private slots:
     void finishRequest();
 public:
-    Subject(int id, QObject* parent = nullptr);
+    Subject(DataType tp, QObject* parent = nullptr);
 
     bool ready();
 
@@ -35,14 +44,13 @@ public:
     void setIn_progress(volatile bool newIn_progress);
 
     void operator()(QNetworkAccessManager* nm,
-                    QNetworkRequest request);
-
-    virtual const QString &url();
+                    QNetworkRequest request,
+                    QByteArray payload);
 
 public slots:
     void processData();
 signals:
-    void data_ready(QByteArray data);
+    void data_ready(QByteArray data, DataType tp);
     void error_occured(QNetworkReply::NetworkError error,
                        QString error_string);
 };

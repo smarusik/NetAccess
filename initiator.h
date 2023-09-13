@@ -6,28 +6,25 @@
 class Initiator: public QObject
 {
     Q_OBJECT
-
-    Subject *subject1_, *subject2_;
-private slots:
-    void subject1UpdateRequested(const QByteArray data);
-
-    void subject2UpdateRequested(const QByteArray data);
-
-    void collectRequestData(const QByteArray data);
-
-    void reportError(QNetworkReply::NetworkError error,
-                     QString errorString);
+Subject *anonymousToken, *accessToken, *proxyAccessToken,
+        *autoserverLocation;
+public slots:
+    void anonymousTokenRq(QNetworkRequest rq, QByteArray payload);
+    void accessTokenRq(QNetworkRequest rq, QByteArray payload);
+    void proxyAccessTokenRq(QNetworkRequest rq, QByteArray payload);
+    void autoserverLocationRq(QNetworkRequest rq, QByteArray payload);
 
 public:
     Initiator(QObject *parent=nullptr);
 
-    void requestData();
-
 signals:
     void subjectUpdateRequested(Subject*,
-                                QNetworkRequest rq);
-    void requestedDataReady(QByteArray data);
-    void dataRequestError(QString description);
+                                QNetworkRequest rq,
+                                QByteArray payload);
+    void requestedDataReady(QByteArray data, DataType tp);
+    void reportError(QNetworkReply::NetworkError error,
+                     QString errorString);
+
 };
 
 #endif // INITIATOR_H
