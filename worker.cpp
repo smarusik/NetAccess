@@ -10,7 +10,6 @@ Worker::Worker(QObject *parent):
 void Worker::process(Subject *subject,
                      QNetworkRequest rq, QByteArray payload)
 {
-    subject->setReady(false);
     (*subject)(nam,rq,payload);
 }
 

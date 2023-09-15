@@ -23,7 +23,6 @@ class Subject:public QObject
     mutable std::mutex mu_;
     QByteArray data_;
     QNetworkReply *reply_;
-    volatile bool ready_=false;
     volatile bool in_progress_=false;
     const DataType dataType_;
 

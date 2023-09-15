@@ -12,18 +12,6 @@ Subject::Subject(DataType tp, QObject *parent):
 {
 }
 
-bool Subject::ready()
-{
-    std::lock_guard _(mu_);
-    return ready_;
-}
-
-void Subject::setReady(volatile bool r)
-{
-    std::lock_guard _(mu_);
-    ready_=r;
-}
-
 const QByteArray Subject::data() const
 {
     std::lock_guard _(mu_);
@@ -73,7 +61,6 @@ void Subject::processData()
         if(reply_->error()==QNetworkReply::NoError)
         {
             data_=reply_->readAll();
-            ready_=true;
             emit data_ready(data_, dataType_);
         }
         else
