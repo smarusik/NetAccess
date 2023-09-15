@@ -4,10 +4,9 @@
 #include "globals.h"
 #include "locationattributes.h"
 
-class AutoserverLocation : public QObject, public SerializableReadable<LocationData>
+class AutoserverLocation : public QObject, public SerializableReadable<CountryLocationData>
 {
     Q_OBJECT
-    CountryLocationData data_;
 
 public:
     AutoserverLocation(QObject* parent=nullptr);

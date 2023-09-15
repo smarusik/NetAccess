@@ -13,7 +13,6 @@
 #include <QJsonDocument>
 
 #include <mutex>
-#include <list>
 
 class Acceptor : public QObject
 {

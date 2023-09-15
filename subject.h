@@ -4,6 +4,7 @@
 #include <QNetworkReply>
 #include <QObject>
 #include <mutex>
+#include <atomic>
 
 enum class DataType
 {
@@ -23,7 +24,7 @@ class Subject:public QObject
     mutable std::mutex mu_;
     QByteArray data_;
     QNetworkReply *reply_;
-    volatile bool in_progress_=false;
+    std::atomic_bool in_progress_=false;
     const DataType dataType_;
 
 private slots:

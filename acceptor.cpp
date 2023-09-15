@@ -101,6 +101,7 @@ void Acceptor::checkData()
         emit rqProxyAccessToken(rq, payload.toJson());
     }
 
+    th.msleep(2000);
     emit scheduleNextCheck();
 }
 
@@ -126,6 +127,7 @@ void Acceptor::dataReceived(QByteArray data, DataType tp)
             break;
         case DataType::AUTOSERVER_LOCATION:
             autoserverLocation_->deserialize(jsData.object());
+
             break;
         case DataType::PROXY_ACCESS_TOKEN:
             proxyAccessToken_->deserialize(jsData.object());

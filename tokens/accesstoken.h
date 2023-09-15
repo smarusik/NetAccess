@@ -8,7 +8,6 @@
 class AccessToken : public QObject, public SerializableReadable<AccessTokenData>
 {
     Q_OBJECT
-    AccessTokenData data_;
 protected:
     void readCommonValues(const QJsonObject &source);
 public:

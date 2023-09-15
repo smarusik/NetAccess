@@ -26,14 +26,12 @@ void Subject::setReply(QNetworkReply *reply)
 
 volatile bool Subject::in_progress() const
 {
-    std::lock_guard _(mu_);
-    return in_progress_;
+    return in_progress_.load();
 }
 
 void Subject::setIn_progress(volatile bool newIn_progress)
 {
-    std::lock_guard _(mu_);
-    in_progress_ = newIn_progress;
+    in_progress_.store(newIn_progress);
 }
 
 void Subject::operator()(QNetworkAccessManager *nm,
@@ -67,12 +65,12 @@ void Subject::processData()
         {
             emit error_occured(reply_->error(), reply_->errorString());
         }
-        reply_->close();
-        reply_->disconnect();
-        reply_->deleteLater();
         disconnect(this, nullptr, nullptr, nullptr);
         connect(reply_, &QNetworkReply::destroyed,
                 this, &Subject::finishRequest);
+        reply_->close();
+        reply_->disconnect();
+        reply_->deleteLater();
 
     }
 }
