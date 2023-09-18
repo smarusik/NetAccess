@@ -40,8 +40,8 @@ public:
 
     void setReply(QNetworkReply* reply);
 
-    volatile bool in_progress() const;
-    void setIn_progress(volatile bool newIn_progress);
+    inline bool in_progress() const;
+    inline void setIn_progress(bool newIn_progress);
 
     void operator()(QNetworkAccessManager* nm,
                     QNetworkRequest request,

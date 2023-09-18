@@ -4,7 +4,8 @@
 #include "globals.h"
 #include "tokenattributes.h"
 
-class ProxyAccessToken : public QObject,public SerializableReadable<ProxyAccessTokenData>
+class ProxyAccessToken : public QObject,
+                         public SerializableReadable<ProxyAccessTokenData>
 {
     Q_OBJECT
 public:

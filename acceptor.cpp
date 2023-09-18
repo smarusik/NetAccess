@@ -76,7 +76,7 @@ void Acceptor::checkData()
         emit rqAutoserverLocation(rq, QByteArray());
 
     }
-    else if (!proxyAccessToken_->isValid())
+    else if (!proxyAccessToken_->isValid() && autoserverLocation_->isValid())
     {
         QNetworkRequest rq;
         rq.setUrl(QUrl(QString(auth_url)+proxy_auth_suffix));
@@ -89,7 +89,7 @@ void Acceptor::checkData()
         QJsonObject rootObj;
         rootObj["externalId"]= QString(machine_id);
         rootObj["type"]="accs-proxy";
-        rootObj["signature"]=proxyAccessToken_->data().signature;
+        rootObj["signature"]=autoserverLocation_->data().servers.at(0).signature;
 
         QJsonObject clientAppObj;
         clientAppObj["name"]=app_type;

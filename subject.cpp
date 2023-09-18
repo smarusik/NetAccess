@@ -24,12 +24,12 @@ void Subject::setReply(QNetworkReply *reply)
     reply_=reply;
 }
 
-volatile bool Subject::in_progress() const
+bool Subject::in_progress() const
 {
     return in_progress_.load();
 }
 
-void Subject::setIn_progress(volatile bool newIn_progress)
+void Subject::setIn_progress(bool newIn_progress)
 {
     in_progress_.store(newIn_progress);
 }
